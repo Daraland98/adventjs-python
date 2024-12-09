@@ -29,31 +29,21 @@ Example:'''
 from typing import List, Literal
 
 def move_train(board: List[str], mov: Literal['U', 'D', 'R', 'L']) -> Literal['none', 'crash', 'eat']:
-    rows, cols = len(board), len(board[0])
-    
-    # Find the position of the train's head (@)
-    for r in range(rows):
-        if '@' in board[r]:
-            head_x, head_y = r, board[r].index('@')
-            break
-    
-    # Define movement directions
-    moves = {'U': (-1, 0), 'D': (1, 0), 'L': (0, -1), 'R': (0, 1)}
-    dx, dy = moves[mov]
+    directions = {'U': (-1, 0), 'D': (1, 0), 'L': (0, -1), 'R': (0, 1)}
+    dx, dy = directions[mov]
+    flat_board = ''.join(board)
+    head_pos = flat_board.index('@')
+    cols = len(board[0])
+    head_x, head_y = divmod(head_pos, cols)
     new_x, new_y = head_x + dx, head_y + dy
-
-    # Check if the new head position is out of bounds
-    if not (0 <= new_x < rows and 0 <= new_y < cols):
+    if not (0 <= new_x < len(board) and 0 <= new_y < cols):
         return 'crash'
-
-    # Check the cell at the new head position
     new_cell = board[new_x][new_y]
-    if new_cell == 'o':  # Crash into itself
-        return 'crash'
-    elif new_cell == '*':  # Collect a magical fruit
-        return 'eat'
-    
-    return 'none'  # Move without any even
+    return {'o': 'crash', '*': 'eat'}.get(new_cell, 'none')
+
+# index(): Returns the index of the first occurrence of a substring in a string, or -1 if not found.
+# divmod(): Divides two numbers and returns a tuple with the quotient and remainder.
+# get(): Retrieves the value for a key in a dictionary; returns a default value if the key is not found.
 
 board = ['·····', '*····', '@····', 'o····', 'o····']
 
